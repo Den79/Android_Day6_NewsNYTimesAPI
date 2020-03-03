@@ -40,6 +40,11 @@ class MainActivity : AppCompatActivity() {
             articles ?: return@Observer
             article_list.adapter = ArticlesAdapter(articles, this)
         })
+        // Swipe to Refresh
+        swipe_refresh_articles_layout.setOnRefreshListener {
+            articlesViewModel.loadPopularArticles()
+            swipe_refresh_articles_layout.isRefreshing = false
+        }
     }
 
     private class ArticlesAdapter (private val articles: List<Article>, val context: Context): RecyclerView.Adapter<ArticlesViewHolder>() {
