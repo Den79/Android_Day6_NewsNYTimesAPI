@@ -38,7 +38,11 @@ class MainActivity : AppCompatActivity() {
 
         articlesViewModel.articles.observe(this, Observer { articles ->
             articles ?: return@Observer
-            article_list.adapter = ArticlesAdapter(articles, this)
+            //article_list.adapter = ArticlesAdapter(articles, this)
+            article_list.adapter = ArticlesAdapter(articles, this) {
+                val intent = ArticleActivity.newIntent(it, this)
+                startActivity(intent)
+            }
         })
         // Swipe to Refresh
         swipe_refresh_articles_layout.setOnRefreshListener {
@@ -47,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private class ArticlesAdapter (private val articles: List<Article>, val context: Context): RecyclerView.Adapter<ArticlesViewHolder>() {
+    private class ArticlesAdapter (private val articles: List<Article>, val context: Context, val articleSelected: (Article) -> Unit): RecyclerView.Adapter<ArticlesViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticlesViewHolder {
             return ArticlesViewHolder(LayoutInflater.from(context).inflate(R.layout.item_article, parent, false))
         }
@@ -62,6 +66,10 @@ class MainActivity : AppCompatActivity() {
 
             article.media.firstOrNull()?.mediaMetadata?.firstOrNull()?.url.let {
                 Glide.with(context).load(it).into(holder.itemView.item_image)
+            }
+            // capture click events
+            holder.itemView.setOnClickListener {
+                articleSelected(article)
             }
         }
     }
